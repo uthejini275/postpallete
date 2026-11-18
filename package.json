@@ -1,0 +1,16 @@
+{
+  "name": "postpallete-smart-cards",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Post Pallete Smart Cards: turn any study PDF into key cards, flip cards, a quiz and a summary.",
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0"
+  }
+}

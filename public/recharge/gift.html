@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Someone made this for you 🔋</title>
+<meta name="description" content="Someone made this for you. Tap the battery to recharge.">
+<meta property="og:title" content="Someone made this for you 💙">
+<meta property="og:description" content="He's been running on 1% for everyone. Tap to recharge him 🔋">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Caveat:wght@600;700&display=swap">
+<link rel="stylesheet" href="/recharge/style.css">
+</head>
+<body class="gift">
+<div class="stars"></div>
+
+<main class="gift-main" id="stateBox" hidden>
+  <div style="font-size:3rem;margin-top:12vh" id="stateIcon">⏳</div>
+  <h1 id="stateTitle"></h1>
+  <p class="sub" id="stateText"></p>
+  <a class="btn btn-blue" href="/recharge" target="_top">Make a Recharge Him gift 🔋</a>
+</main>
+
+<main class="gift-main" id="giftBox" hidden>
+  <div class="for" id="for"></div>
+  <h1 id="head"></h1>
+  <p class="sub" id="sub"></p>
+
+  <div class="batt-wrap" id="bwrap">
+    <div class="glow" id="glow"></div>
+    <button class="battery" id="battery" type="button" aria-label="Recharge">
+      <span class="cells"><span class="fill" id="fill"></span></span>
+      <span class="pct" id="pct">1%</span>
+    </button>
+    <span class="bolt" id="bolt">⚡</span>
+  </div>
+  <div class="hint" id="hint"><i></i>Tap the battery</div>
+
+  <ul class="reasons" id="reasons"></ul>
+
+  <div class="letter" id="letter" hidden>
+    <div class="photo" id="photo"></div>
+    <div class="note" id="note"></div>
+    <div class="sign" id="sign"></div>
+  </div>
+  <div class="actions" id="actions" hidden>
+    <button class="btn" id="replay" type="button">↺ Charge him again</button>
+    <a class="btn btn-blue" id="make" href="/recharge" target="_top">Make one for someone 🔋</a>
+  </div>
+
+  <div class="made">Made with 💙 by <b>@thedp.webstudio</b></div>
+</main>
+
+<script src="/recharge/gift-data.js"></script>
+<script>
+const SAMPLE = {
+  to: "Appa", from: "Your daughter",
+  reasons: [
+    ["🔧", "You fix everything, even when nobody says thank you."],
+    ["🌙", "You worked late so we never had to worry."],
+    ["🙂", "You hide your tiredness behind a smile."],
+    ["🚲", "You taught me to ride, to drive, and to never give up."],
+    ["💙", "You always put us first. Today, you come first."]
+  ],
+  note: "Happy Men's Day, Appa.\nYou've been carrying all of us for years.\nToday, rest a little.\nYou are loved more than you know."
+};
+const $=id=>document.getElementById(id);
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const mix=(a,b,p)=>a.map((v,i)=>Math.round(v+(b[i]-v)*p));
+const LOW=[255,90,95], MID=[255,181,71], FULL=[61,220,151];
+const colorFor=l=>{const p=l/100;return p<.5?mix(LOW,MID,p/.5):mix(MID,FULL,(p-.5)/.5);};
+const stepsFor=n=>Array.from({length:n+1},(_,i)=>i===0?1:Math.round(1+99*i/n));
+const inPreview = window.self !== window.top;
+let GIFT = SAMPLE, STEPS = stepsFor(5), st, busy = false;
+
+function showState(icon, title, text){
+  $("giftBox").hidden = true; $("stateBox").hidden = false;
+  $("stateIcon").textContent = icon; $("stateTitle").textContent = title; $("stateText").textContent = text;
+}
+function setup(){
+  STEPS = stepsFor(GIFT.reasons.length);
+  $("for").textContent = "For " + GIFT.to + " 💙";
+  $("sign").textContent = GIFT.from ? "— " + GIFT.from : "";
+  $("photo").textContent = (GIFT.to.trim()[0] || "♥").toUpperCase();
+  if (!inPreview) document.title = "For " + GIFT.to + " 🔋";
+  $("reasons").replaceChildren();
+  $("stateBox").hidden = true; $("giftBox").hidden = false;
+}
+
+/* draw(state) renders the whole screen from one state object */
+function draw(s){
+  const l=Math.round(s.level), rgb=colorFor(s.level), c=`rgb(${rgb})`;
+  $("fill").style.height=Math.max(3,s.level)+"%";
+  $("fill").style.background=`linear-gradient(0deg, ${c}, rgb(${mix(rgb,[255,255,255],.25)}))`;
+  $("fill").style.color=c;
+  $("pct").textContent=l+"%";
+  $("glow").style.background=`radial-gradient(circle, rgba(${rgb},${.15+.35*s.level/100}), transparent 70%)`;
+  $("bolt").style.opacity=s.bolt; $("bolt").style.transform=`scale(${.7+.5*s.bolt})`;
+  const done=s.level>=99.5, n=GIFT.reasons.length;
+  $("head").textContent= s.shown===0 ? "He's been running on 1% for everyone." : done ? "Fully charged 💙" : "Charging… keep going ⚡";
+  $("sub").textContent= s.shown===0 ? "Tap the battery to recharge him." : done ? "Now read this, "+GIFT.to+"." : `${n-s.shown} more to go`;
+  $("hint").style.visibility= done?"hidden":"visible";
+  const ul=$("reasons");
+  while(ul.children.length<s.shown){
+    const r=GIFT.reasons[ul.children.length], li=document.createElement("li"), b=document.createElement("b"), sp=document.createElement("span");
+    b.textContent=r[0]; sp.textContent=r[1]; li.append(b,sp); ul.prepend(li);
+  }
+  while(ul.children.length>s.shown) ul.firstChild.remove();
+  [...ul.children].forEach((li,i)=>{const p=i===0?s.newest:1; li.style.opacity=p; li.style.transform=`translateY(${(1-p)*-16}px)`;});
+  $("letter").hidden=s.letter<=0; $("actions").hidden=s.letter<1; ul.hidden=s.letter>0;
+  const k=clamp(s.letter*4);
+  $("bwrap").style.transform= s.letter>0?`scale(${1-.45*k})`:"none";
+  $("bwrap").style.marginBottom= s.letter>0?`${-86*k}px`:"0";
+  $("letter").style.opacity=clamp(s.letter*5); $("letter").style.transform=`rotateX(${(1-clamp(s.letter*5))*40}deg)`;
+  $("note").textContent=GIFT.note.slice(0,Math.floor(GIFT.note.length*clamp((s.letter-.15)/.85)));
+}
+function reset(){ st={level:1,shown:0,newest:1,bolt:0,letter:0}; busy=false; draw(st); }
+function animate(dur, fn, then){
+  const t0=performance.now(), reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  (function f(now){ const p=reduce?1:clamp((now-t0)/dur); fn(p); draw(st); if(p<1) requestAnimationFrame(f); else then&&then(); })(t0);
+}
+function charge(){
+  if(busy||st.shown>=GIFT.reasons.length) return;
+  busy=true; const from=st.level, to=STEPS[st.shown+1]; st.shown++;
+  animate(800, p=>{const e=1-Math.pow(1-p,3); st.level=from+(to-from)*e; st.newest=e; st.bolt=Math.sin(p*Math.PI);}, ()=>{
+    busy=false;
+    if(st.shown===GIFT.reasons.length) setTimeout(()=>animate(5200,p=>{st.letter=p;}),700);
+  });
+}
+$("battery").addEventListener("click",charge);
+$("replay").addEventListener("click",reset);
+window.gift = { draw, steps: () => STEPS };
+
+function show(g){ GIFT = g; setup(); reset(); }
+
+async function start(){
+  const m = location.pathname.match(/^\/r\/([A-Za-z0-9]{6,20})\/?$/);
+  if (m) {
+    // A real, bought gift: load it from the server. It opens only once it's paid for.
+    try {
+      const r = await fetch("/api/wish?id=" + encodeURIComponent(m[1]));
+      const j = await r.json();
+      if (!r.ok || j.error) return showState("🔍", "We couldn't find this gift", "Check that the link is complete. Links look like postpallete.vercel.app/r/AbC123xYz9.");
+      if (j.pending) return showState("⏳", "This gift is almost ready", "It opens as soon as the payment is confirmed. Try again in a few minutes.");
+      if (j.kind !== "recharge") { location.replace("/b/" + m[1]); return; }
+      const g = GiftData.normalise(j);
+      return g ? show(g) : showState("🔍", "We couldn't open this gift", "Please ask the person who sent it to check the link.");
+    } catch (e) {
+      return showState("📶", "Couldn't load the gift", "Check your internet connection and refresh the page.");
+    }
+  }
+  const hash = location.hash.slice(1);
+  if (hash) {
+    // Previews of unsaved text only work inside the create page.
+    if (!inPreview) return showState("🔋", "This is only a preview", "Real gifts have a link like postpallete.vercel.app/r/… Make yours on the create page.");
+    const g = GiftData.decode(hash);
+    return show(g || SAMPLE);
+  }
+  show(SAMPLE);
+}
+/* the create page updates its live preview by changing the hash */
+window.addEventListener("hashchange", () => { if (inPreview) { const g = GiftData.decode(location.hash.slice(1)); show(g || SAMPLE); } });
+if (inPreview) document.body.classList.add("in-preview");
+start();
+</script>
+</body>
+</html>

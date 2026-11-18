@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orders · Post Pallete</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  .orders { display: flex; flex-direction: column; gap: 10px; }
+  .order { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; background: var(--panel); }
+  .order .who { font-weight: 800; }
+  .order .meta { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .order .code { font-family: var(--f-display); font-weight: 800; letter-spacing: .05em; }
+  .tag { font-size: 12px; font-weight: 800; border-radius: 999px; padding: 2px 9px; }
+  .tag.paid { background: var(--mint-soft); color: var(--good); }
+  .tag.unpaid { background: var(--sun-soft); }
+  .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .quick { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+  .quick label { flex: 1; min-width: 180px; }
+  @media (max-width: 520px) { .order { grid-template-columns: minmax(0, 1fr); } .acts { justify-content: flex-start; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Post Pallete Studio · owner only</div>
+    <h1>Surprise orders</h1>
+    <p class="lede">Birthday surprises (🎂, ₹29) and Recharge Him gifts (🔋, ₹50) both show here. Orders marked "⏳ Check payment" are from people who tapped "I've paid". Open your UPI app's payment history and look for a payment of the right amount whose note has the same order code (like "Surprise PP-8V3CH"). If it's there, tap "Approve" and their link starts working straight away. Razorpay payments are approved automatically.</p>
+  </header>
+
+  <section class="panel stack-v" id="login">
+    <label class="f" for="key">Owner password (your ADMIN_KEY)<input id="key" type="password" autocomplete="current-password"></label>
+    <div class="btn-row"><button class="btn primary" id="go" type="button">Show orders</button><span class="status" id="status" role="status"></span></div>
+  </section>
+
+  <section class="panel stack-v" id="area" hidden>
+    <div class="quick">
+      <label class="f" for="ref">Order code or link<input id="ref" type="text" placeholder="PP-7K3QX" autocomplete="off"></label>
+      <button class="btn primary" id="mark" type="button">Approve</button>
+      <button class="btn" id="refresh" type="button">Refresh list</button>
+    </div>
+    <div class="orders" id="orders"></div>
+  </section>
+</div>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  let key = "";
+  try { key = sessionStorage.getItem("pp-admin") || ""; } catch (e) {}
+  const setStatus = (t, err) => { $("status").textContent = t; $("status").classList.toggle("err", !!err); };
+
+  async function call(body) {
+    const r = await fetch("/api/admin", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key, ...body }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw j.error || "busy";
+    return j;
+  }
+  const msg = (e) => e === "wrong_key" ? "Wrong password." : e === "no_admin_key" ? "ADMIN_KEY isn't set in Vercel yet." : e === "not_found" ? "No order with that code." : e === "server_setup" ? "Upstash isn't connected yet." : "Something went wrong. Try again.";
+
+  async function load() {
+    const j = await call({ action: "list" });
+    $("login").hidden = true; $("area").hidden = false;
+    const box = $("orders"); box.innerHTML = "";
+    if (!j.orders.length) { const p = document.createElement("p"); p.className = "note"; p.textContent = "No orders yet."; box.appendChild(p); }
+    j.orders.forEach((o) => {
+      const row = document.createElement("div"); row.className = "order";
+      const left = document.createElement("div");
+      const who = document.createElement("div"); who.className = "who";
+      const code = document.createElement("span"); code.className = "code"; code.textContent = o.code + "  ";
+      const isRecharge = o.kind === "recharge";
+      who.append(code, (isRecharge ? "🔋 " : "🎂 ") + "For " + o.to + (o.from ? " · from " + o.from : "") + "  ");
+      const status = o.paid ? "paid" : o.status === "checking" ? "checking" : "unpaid";
+      const tag = document.createElement("span"); tag.className = "tag " + (status === "paid" ? "paid" : "unpaid");
+      tag.textContent = status === "paid" ? "Paid" + (o.paidVia === "razorpay" ? " (Razorpay)" : "") : status === "checking" ? "⏳ Check payment" : "Not paid yet";
+      who.appendChild(tag);
+      const meta = document.createElement("div"); meta.className = "meta";
+      meta.textContent = new Date(o.createdAt).toLocaleString() + (isRecharge ? " · Recharge Him" : " · " + o.photos + " photo" + (o.photos === 1 ? "" : "s")) +
+        (o.claimAt ? " · said they paid at " + new Date(o.claimAt).toLocaleTimeString() : "") + (o.utr ? " · UPI transaction ID: " + o.utr : "") + (o.paymentId ? " · Razorpay: " + o.paymentId : "");
+      left.append(who, meta);
+      const acts = document.createElement("div"); acts.className = "acts";
+      const view = document.createElement("a"); view.className = "btn small"; view.textContent = "View"; view.href = (isRecharge ? "/r/" : "/b/") + o.id; view.target = "_blank"; view.rel = "noopener"; view.style.textDecoration = "none";
+      const toggle = document.createElement("button"); toggle.type = "button"; toggle.className = "btn small" + (o.paid ? "" : " primary");
+      toggle.textContent = o.paid ? "Undo approval" : "Approve";
+      toggle.addEventListener("click", () => act(o.paid ? "unpaid" : "paid", o.id));
+      const delBtn = document.createElement("button"); delBtn.type = "button"; delBtn.className = "btn small"; delBtn.textContent = "Delete";
+      let armed = false;
+      delBtn.addEventListener("click", () => {
+        if (!armed) { armed = true; delBtn.textContent = "Tap again to delete"; setTimeout(() => { armed = false; delBtn.textContent = "Delete"; }, 3000); return; }
+        act("delete", o.id);
+      });
+      acts.append(view, toggle, delBtn);
+      row.append(left, acts); box.appendChild(row);
+    });
+  }
+  async function act(action, ref) {
+    try { await call({ action, ref }); await load(); } catch (e) { alertBox(msg(e)); }
+  }
+  function alertBox(t) { $("ref").setCustomValidity(t); $("ref").reportValidity(); setTimeout(() => $("ref").setCustomValidity(""), 2500); }
+
+  $("go").addEventListener("click", async () => {
+    key = $("key").value; setStatus("Checking…");
+    try { await load(); try { sessionStorage.setItem("pp-admin", key); } catch (e) {} setStatus(""); }
+    catch (e) { setStatus(msg(e), true); }
+  });
+  $("key").addEventListener("keydown", (e) => { if (e.key === "Enter") $("go").click(); });
+  $("mark").addEventListener("click", () => { const r = $("ref").value.trim(); if (r) act("paid", r).then(() => { $("ref").value = ""; }); });
+  $("refresh").addEventListener("click", () => load().catch((e) => alertBox(msg(e))));
+  if (key) load().catch(() => { $("login").hidden = false; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Birthday Surprise Maker · Post Pallete</title>
+<meta name="description" content="Make a cute birthday surprise page with photos, a letter, music and a cake to blow out. Share it as a link on WhatsApp or Instagram.">
+<meta property="og:title" content="Birthday Surprise Maker 🎁">
+<meta property="og:description" content="Make a cute birthday surprise page with photos, a letter, music and a cake. Share it as a link.">
+<meta name="theme-color" content="#8b5cf6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%8E%81%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&family=Caveat:wght@600;700&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  .bd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .bd { grid-template-columns: minmax(0, 1fr); } .phone-col { order: -1; } }
+  .phone-col { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  @media (max-width: 860px) { .phone-col { position: static; } }
+  .phone { width: min(100%, 340px); aspect-ratio: 9 / 17; border-radius: 34px; border: 10px solid var(--fg); background: var(--fg); overflow: hidden; box-shadow: 0 18px 40px rgba(60, 30, 100, .22); }
+  .phone iframe { width: 100%; height: 100%; border: 0; display: block; border-radius: 24px; background: #f3e8ff; }
+  .jump { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .jump button { font: 800 12px var(--f-body); border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 999px; padding: 5px 11px; cursor: pointer; }
+  .jump button:hover { border-color: var(--accent); }
+  textarea { font: 600 15px var(--f-body); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; width: 100%; min-height: 130px; resize: vertical; text-transform: none; letter-spacing: 0; }
+  textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .counter { font-size: 12px; color: var(--muted); text-align: right; font-weight: 700; text-transform: none; letter-spacing: 0; }
+  .photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .ph { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; position: relative; }
+  .ph img { width: 100%; aspect-ratio: 4 / 4.4; object-fit: cover; display: block; }
+  .ph input { border: none; border-top: 1px solid var(--line); border-radius: 0; font-size: 13px; padding: 8px; }
+  .ph .x { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(0, 0, 0, .55); color: #fff; font-size: 16px; cursor: pointer; line-height: 1; }
+  .add-ph { border: 2px dashed var(--accent); border-radius: 14px; background: var(--accent-soft); color: var(--fg); font: 800 14px var(--f-body); cursor: pointer; min-height: 150px; display: grid; place-items: center; padding: 10px; text-align: center; }
+  .themes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .theme { font: 800 13px var(--f-body); border-radius: 999px; padding: 8px 14px; cursor: pointer; border: 2px solid transparent; color: #3a2d55; }
+  .theme[aria-pressed="true"] { border-color: var(--fg); }
+  .switch { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .switch input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .group-h { font-family: var(--f-display); font-size: 18px; margin: 0; }
+  .stack-v { display: flex; flex-direction: column; gap: 12px; }
+  .done { border: 2px solid var(--mint); background: var(--mint-soft); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .done h2 { margin: 0; }
+  .linkbox { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .linkbox code { flex: 1; min-width: 0; word-break: break-all; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font-size: 13px; }
+  .pay { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; background: var(--panel); border-radius: 14px; padding: 14px; }
+  @media (max-width: 480px) { .pay { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; } }
+  .qr { width: 150px; height: 150px; background: #fff; border-radius: 10px; padding: 6px; display: grid; place-items: center; }
+  .qr img { width: 100%; height: 100%; image-rendering: pixelated; }
+  .price { font-family: var(--f-display); font-size: 30px; font-weight: 800; line-height: 1; }
+  .steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14.5px; }
+  .code { font-family: var(--f-display); font-weight: 800; font-size: 20px; letter-spacing: .06em; background: var(--sun-soft); border-radius: 8px; padding: 1px 8px; }
+  .mine { display: flex; flex-direction: column; gap: 8px; }
+  .mine a { color: var(--accent); font-weight: 800; }
+  .feat { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="topbar">
+      <div class="brand">Post Pallete Studio</div>
+      <a class="ig" id="ig-link" href="https://www.instagram.com/postpallete_.stdio/" target="_blank" rel="noopener">Follow @postpallete_.stdio</a>
+    </div>
+    <h1>Make a <em>birthday surprise</em> page 🎁</h1>
+    <p class="lede">A birthday wish that plays like an Instagram story. It can stay locked until midnight, ask a secret question only they know, count their life in numbers and hide a scratch-to-reveal photo. It ends with a cake they blow out by blowing on their phone. 🌬️🎂</p>
+    <div class="feat"><span class="pill">🔒 Midnight lock</span><span class="pill">🤨 Secret question</span><span class="pill">📊 Life in numbers</span><span class="pill">📸 Photo stories</span><span class="pill">🤫 Scratch reveal</span><span class="pill">💌 Letter</span><span class="pill">🌬️ Blow the candles</span><span class="pill">🎆 Fireworks</span></div>
+  </header>
+
+  <div class="bd">
+    <section class="panel stack-v" aria-label="Surprise details">
+      <div class="stack-v">
+        <h2 class="group-h">Who's the birthday for?</h2>
+        <div class="row2">
+          <label class="f" for="to">Their name *<input id="to" type="text" maxlength="30" placeholder="e.g. Ananya" autocomplete="off"></label>
+          <label class="f" for="from">Your name <small>(signs the letter)</small><input id="from" type="text" maxlength="30" placeholder="e.g. Priya" autocomplete="off"></label>
+        </div>
+        <div class="row2">
+          <label class="f" for="dob">Date of birth <small>(adds "your life in numbers")</small><input id="dob" type="date"></label>
+          <label class="f" for="age">Age they're turning <small>(optional)</small><input id="age" type="number" min="1" max="119" placeholder="e.g. 20"></label>
+        </div>
+      </div>
+
+      <div class="stack-v">
+        <h2 class="group-h">Your letter 💌</h2>
+        <label class="f" for="message">Message
+          <textarea id="message" maxlength="700" placeholder="Write something from the heart…"></textarea>
+          <span class="counter" id="msg-count">0 / 700</span>
+        </label>
+      </div>
+
+      <div class="stack-v">
+        <h2 class="group-h">Photos 📸 <small class="note">(up to 6)</small></h2>
+        <input type="file" id="photo-input" accept="image/*" multiple hidden>
+        <div class="photos" id="photos"></div>
+      </div>
+
+      <div class="stack-v">
+        <h2 class="group-h">Extra surprises ✨</h2>
+        <label class="switch" for="scratch"><input type="checkbox" id="scratch" checked> 🤫 Make the last photo a scratch-to-reveal secret</label>
+        <label class="switch" for="lock"><input type="checkbox" id="lock"> 🔒 Keep it locked until midnight on their birthday</label>
+        <label class="f" for="unlock" id="unlock-wrap" hidden>Their birthday <small>(opens at 12:00 AM on this date)</small><input id="unlock" type="date"></label>
+        <div class="row2">
+          <label class="f" for="question">🤨 Secret question <small>(optional)</small><input id="question" type="text" maxlength="80" placeholder="e.g. What do I call you?" autocomplete="off"></label>
+          <label class="f" for="answer">Answer only they know<input id="answer" type="text" maxlength="40" placeholder="e.g. Chinni" autocomplete="off"></label>
+        </div>
+        <p class="note" style="margin:0">They must answer the secret question before the surprise opens. Capital letters don't matter.</p>
+      </div>
+
+      <div class="stack-v">
+        <h2 class="group-h">Look and sound</h2>
+        <div class="themes" id="themes"></div>
+        <label class="switch" for="music"><input type="checkbox" id="music" checked> Play a soft birthday tune</label>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" id="create" type="button">Create my surprise link</button>
+        <span class="status" id="status" role="status"></span>
+      </div>
+
+      <div class="done" id="done" hidden></div>
+    </section>
+
+    <aside class="phone-col" aria-label="Live preview">
+      <div class="phone"><iframe id="preview" title="Live preview of the surprise" src="/birthday/surprise.html?preview=1"></iframe></div>
+      <div class="jump" id="jump"></div>
+      <p class="note" style="margin:0;text-align:center">Live preview · tap inside it to try</p>
+    </aside>
+  </div>
+
+  <section class="panel mine" id="mine" hidden>
+    <h2 class="group-h">Surprises you made on this phone</h2>
+    <div id="mine-list" class="stack-v"></div>
+  </section>
+
+  <footer>Made with 💜 by <a href="https://www.instagram.com/postpallete_.stdio/" target="_blank" rel="noopener">@postpallete_.stdio</a> · Your photos are only used for your surprise page. Pages stay online for about a year. To remove one sooner, DM us your order code.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="/birthday/maker.js"></script>
+</body>
+</html>

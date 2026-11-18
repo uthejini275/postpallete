@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A birthday surprise for you 🎁</title>
+<meta name="description" content="Someone made a birthday surprise for you. Tap to open it!">
+<meta property="og:title" content="🎁 A birthday surprise for you">
+<meta property="og:description" content="Someone made something special for you. Open it 💜">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1d1740">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%8E%81%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&family=Caveat:wght@600;700&display=swap">
+<link rel="stylesheet" href="/birthday/surprise.css">
+</head>
+<body class="t-lilac">
+  <div class="bg" aria-hidden="true"><span class="blob o1"></span><span class="blob o2"></span><span class="blob o3"></span></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <!-- Gate 1: midnight lock -->
+  <section class="gate" id="lock" hidden aria-label="Locked until midnight">
+    <div class="lock-ico" aria-hidden="true">🔒</div>
+    <p class="eyebrow">Shh… it's a surprise</p>
+    <h1 class="gate-h" id="lock-h">This opens at midnight</h1>
+    <div class="clock" id="clock" aria-live="polite">00:00:00</div>
+    <p class="gate-sub" id="lock-sub">Come back at 12:00 AM on your birthday 🌙</p>
+    <button class="pill-btn" id="lock-open" type="button" hidden>It's time! Open it 🎉</button>
+  </section>
+
+  <!-- Gate 2: secret question -->
+  <section class="gate" id="quiz" hidden aria-label="Secret question">
+    <div class="quiz-emoji" id="quiz-emoji" aria-hidden="true">🤨</div>
+    <p class="eyebrow" id="quiz-eyebrow">Wait a second…</p>
+    <h1 class="gate-h" id="quiz-h">Prove you're really them</h1>
+    <p class="quiz-q" id="quiz-q"></p>
+    <form class="quiz-form" id="quiz-form" autocomplete="off">
+      <input id="quiz-in" type="text" maxlength="40" placeholder="Type your answer" aria-label="Your answer">
+      <button class="pill-btn" type="submit">Unlock 💜</button>
+    </form>
+    <p class="quiz-msg" id="quiz-msg" role="status"></p>
+  </section>
+
+  <!-- The story -->
+  <div class="story" id="story" hidden>
+    <div class="bars" id="bars" aria-hidden="true"></div>
+    <div class="slides" id="slides">
+
+      <section class="slide s-intro" data-key="intro">
+        <div class="eyes" aria-hidden="true">👀</div>
+        <h1 class="intro-h" id="intro-h">Psst…</h1>
+        <p class="intro-sub">Someone spent a lot of time making this just for you.</p>
+        <p class="tap-hint">Tap anywhere to start →</p>
+      </section>
+
+      <section class="slide s-title" data-key="title">
+        <h1 class="kinetic" id="kinetic" aria-label="Happy Birthday"></h1>
+        <p class="big-name" id="big-name"></p>
+        <svg class="swash" viewBox="0 0 300 30" aria-hidden="true"><path d="M5 20 C 60 5, 120 28, 170 14 S 260 6, 295 16" /></svg>
+        <div class="burst" id="burst" hidden><span id="burst-n"></span><small id="burst-s"></small></div>
+      </section>
+
+      <section class="slide s-numbers" data-key="numbers">
+        <p class="eyebrow">Your life in numbers</p>
+        <div class="stats">
+          <div class="stat"><b data-count="days">0</b><span>days on this planet 🌍</span></div>
+          <div class="stat"><b data-count="hours">0</b><span>hours of being awesome ⏰</span></div>
+          <div class="stat"><b data-count="beats">0</b><span>heartbeats (roughly) ❤️</span></div>
+          <div class="stat"><b data-count="moons">0</b><span>full moons seen 🌕</span></div>
+        </div>
+        <p class="born" id="born"></p>
+      </section>
+
+      <!-- photo slides are added here by the script -->
+
+      <section class="slide s-scratch" data-key="scratch" data-hold="1">
+        <p class="eyebrow">🤫 One secret photo</p>
+        <h2 class="slide-h">Scratch to reveal</h2>
+        <div class="scratch-card" id="scratch-card">
+          <img id="scratch-img" alt="Secret photo">
+          <canvas id="scratch-cv" aria-label="Scratch here with your finger"></canvas>
+        </div>
+        <p class="scratch-cap" id="scratch-cap"></p>
+      </section>
+
+      <section class="slide s-letter" data-key="letter">
+        <div class="paper">
+          <span class="seal" aria-hidden="true">💜</span>
+          <p class="dear" id="l-dear"></p>
+          <p class="msg" id="l-msg"></p>
+          <p class="sign" id="l-sign"></p>
+        </div>
+      </section>
+
+      <section class="slide s-cake" data-key="cake" data-hold="1">
+        <p class="eyebrow" id="c-top">Close your eyes. Make a wish…</p>
+        <div class="cake" id="cake" role="button" tabindex="0" aria-label="Tap the candles to blow them out">
+          <div class="candles" id="candles"></div>
+          <div class="tier t2"></div><div class="tier t1"></div><div class="plate"></div>
+        </div>
+        <div class="cake-actions" id="cake-actions">
+          <button class="pill-btn" id="mic-btn" type="button">🌬️ Blow into your phone</button>
+          <p class="gate-sub" id="mic-msg">or tap the candles</p>
+        </div>
+        <div class="finale" id="finale" hidden>
+          <h2 class="finale-h" id="finale-h"></h2>
+          <p class="finale-sub">May all your wishes come true ✨</p>
+          <div class="finale-btns">
+            <a class="pill-btn" id="reply" href="#" target="_blank" rel="noopener">💬 Say thank you on WhatsApp</a>
+            <button class="ghost-btn" id="replay" type="button">↺ Watch again</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <button class="nav prev" id="prev" type="button" aria-label="Previous"></button>
+    <button class="nav next" id="next" type="button" aria-label="Next"></button>
+  </div>
+
+  <button class="music" id="music" type="button" aria-label="Turn music off" hidden>♪</button>
+  <a class="made" id="made" href="/birthday" target="_blank" rel="noopener">Made with 💜 Post Pallete · make one for a friend</a>
+  <div class="ribbon" id="ribbon" hidden></div>
+  <div class="loading" id="loading" hidden><p>Loading your surprise…</p></div>
+
+  <script src="/birthday/surprise.js"></script>
+</body>
+</html>

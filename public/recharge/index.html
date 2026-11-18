@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Recharge Him 🔋 · Men's Day gift in 2 minutes</title>
+<meta name="description" content="Make a Men's Day gift page for your dad, brother or partner. He taps a battery stuck at 1% and recharges it, one reason at a time.">
+<meta property="og:title" content="Recharge Him 🔋 · Men's Day gift">
+<meta property="og:description" content="He's been running on 1% for everyone. Make him a gift page in 2 minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Caveat:wght@600;700&display=swap">
+<link rel="stylesheet" href="/recharge/style.css">
+<style>
+.sheet-bg{position:fixed;inset:0;z-index:30;background:rgba(5,8,18,.72);display:grid;place-items:center;padding:max(16px, env(safe-area-inset-top,0px)) max(16px, env(safe-area-inset-right,0px)) max(16px, env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px))}
+.sheet{width:min(460px,100%);max-height:100%;overflow:auto;background:var(--night2);border:1px solid var(--line);border-radius:24px;padding:24px 20px;display:grid;gap:14px;text-align:center}
+.sheet h2{margin:0;font-size:1.5rem}
+.sheet p{margin:0;color:var(--muted);line-height:1.55}
+.code{font-weight:800;letter-spacing:.06em;color:#F2C14E;white-space:nowrap}
+.upi{background:var(--night);border:1px solid var(--line);border-radius:14px;padding:12px;font-weight:700;word-break:break-all}
+.status{min-height:1.4em;font-size:.92rem;color:var(--muted)}
+.status.err{color:var(--low)}
+.mine{margin-top:6px;font-size:.88rem;color:var(--muted);text-align:center}
+.mine a{color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<header class="wrap top">
+  <a class="logo" href="/recharge">Recharge <span>Him</span> 🔋</a>
+  <span class="price-pill" id="pricePill">₹50 only</span>
+</header>
+
+<section class="wrap hero">
+  <h1>He's been running on <em>1%</em> for everyone. Recharge him.</h1>
+  <p>Make a Men's Day gift page in 2 minutes. He taps the battery, reads your reasons one by one, and at 100% finds your note.</p>
+  <div class="steps"><span>1. Write your reasons</span><span id="stepPay">2. Pay ₹50</span><span>3. Send him the link</span></div>
+</section>
+
+<section class="wrap maker">
+  <form class="panel" id="form" novalidate>
+    <h2>Who is it for?</h2>
+    <div class="presets" id="presets" role="group" aria-label="Quick fill">
+      <button type="button" class="chip" data-p="dad">Dad</button>
+      <button type="button" class="chip" data-p="brother">Brother</button>
+      <button type="button" class="chip" data-p="partner">Partner</button>
+      <button type="button" class="chip" data-p="friend">Friend</button>
+    </div>
+    <div class="row2">
+      <label for="to">His name <small>(what you call him)</small><input id="to" maxlength="30" placeholder="Appa, Anna, Rahul…" required></label>
+      <label for="from">From <small>(your name)</small><input id="from" maxlength="40" placeholder="Your daughter"></label>
+    </div>
+
+    <h2>5 reasons he's amazing</h2>
+    <div id="reasonRows" style="display:grid;gap:10px"></div>
+
+    <label for="note">Your note <small>(he reads this at 100%)</small><textarea id="note" maxlength="400"></textarea></label>
+  </form>
+
+  <aside class="preview">
+    <span class="lbl">Live preview · tap the battery</span>
+    <div class="phone"><iframe id="pv" title="Gift preview" src="/recharge/gift.html"></iframe></div>
+    <div class="pay">
+      <button class="btn btn-green" id="payBtn" type="button">Pay ₹50 &amp; get his link 🔋</button>
+      <div class="status" id="status" role="status"></div>
+      <small>Secure payment by Razorpay · UPI, cards, wallets</small>
+      <div class="mine" id="mine" hidden></div>
+    </div>
+  </aside>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Made with 💙 by <b>@thedp.webstudio</b> · Post Pallete Studio</span>
+    <span>Questions? DM <b id="igFoot">@thedp.webstudio</b></span>
+  </div>
+</footer>
+
+<!-- after payment -->
+<div class="sheet-bg" id="readyBg" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="readyTitle">
+    <div style="font-size:2.6rem">🔋💙</div>
+    <h2 id="readyTitle">Paid! His gift is ready</h2>
+    <p>Send him this link. It works on any phone.</p>
+    <div class="linkbox"><input id="link" readonly aria-label="Gift link"><button class="btn btn-blue" id="copy" type="button">Copy</button></div>
+    <a class="btn btn-green" id="wa" target="_blank" rel="noopener">Send on WhatsApp 💬</a>
+    <a class="btn" id="openGift" target="_blank" rel="noopener">Open his gift 🔋</a>
+    <p class="tip">💡 Send it with: <b>"Open this when you're free 💙"</b>. Your order code is <span class="code" id="readyCode"></span>.</p>
+    <button class="btn" id="readyClose" type="button">Make another</button>
+  </div>
+</div>
+
+<!-- manual UPI, only when Razorpay isn't available -->
+<div class="sheet-bg" id="upiBg" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="upiTitle">
+    <h2 id="upiTitle">Pay <span id="upiAmt">₹50</span> by UPI</h2>
+    <p>Pay to this UPI ID and write your order code <span class="code" id="upiCode"></span> in the note.</p>
+    <div class="upi" id="upiId"></div>
+    <a class="btn btn-blue" id="upiOpen">Open my UPI app</a>
+    <label for="utr" style="text-align:left">After paying, paste the UPI transaction ID <small>(optional, makes it faster)</small><input id="utr" inputmode="numeric" maxlength="30" placeholder="e.g. 431245678901"></label>
+    <button class="btn btn-green" id="paidBtn" type="button">I've paid</button>
+    <div class="status" id="upiStatus" role="status"></div>
+    <button class="btn" id="upiClose" type="button">Close</button>
+  </div>
+</div>
+
+<script src="/recharge/gift-data.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+let config={rechargePrice:50,razorpay:false,upiId:"",upiName:"Post Pallete Studio",instagram:"thedp.webstudio"};
+
+const PRESETS={
+  dad:{to:"Appa",from:"Your daughter",reasons:[["🔧","You fix everything, even when nobody says thank you."],["🌙","You worked late so we never had to worry."],["🙂","You hide your tiredness behind a smile."],["🚲","You taught me to ride, to drive, and to never give up."],["💙","You always put us first. Today, you come first."]],note:"Happy Men's Day, Appa.\nYou've been carrying all of us for years.\nToday, rest a little.\nYou are loved more than you know."},
+  brother:{to:"Anna",from:"Your little sister",reasons:[["🛡️","You've always had my back, even when I was wrong."],["😂","You make me laugh when nobody else can."],["📞","You pick up every call, at any time."],["🎮","You let me win (sometimes)."],["💙","You're my first best friend."]],note:"Happy Men's Day, Anna.\nThanks for always being there.\nTake a break today, you've earned it.\nLove you, even if I never say it."},
+  partner:{to:"Babe",from:"Me",reasons:[["☕","You make my mornings better."],["🫂","You hold everything together, even on hard days."],["🌧️","You listen when I'm not okay."],["✨","You make ordinary days feel special."],["💙","You deserve the same love you give."]],note:"Happy Men's Day, love.\nYou take care of everyone.\nToday, let me take care of you.\nI'm so proud of you."},
+  friend:{to:"Bro",from:"Your friend",reasons:[["🍕","You never say no to a late-night plan."],["🛵","You show up, no questions asked."],["🧠","Your advice is actually good (don't tell anyone)."],["🎉","Every memory with you is a good one."],["💙","You deserve a break too."]],note:"Happy Men's Day, bro.\nYou're always there for everyone.\nThis one's for you.\nRest up, champ."}
+};
+const N=5;
+for(let i=0;i<N;i++){
+  const d=document.createElement("div"); d.className="reason-row";
+  d.innerHTML=`<input id="e${i}" maxlength="4" aria-label="Emoji ${i+1}"><input id="r${i}" maxlength="120" aria-label="Reason ${i+1}" placeholder="Reason ${i+1}">`;
+  $("reasonRows").appendChild(d);
+}
+function read(){
+  const reasons=[]; for(let i=0;i<N;i++){ const t=$("r"+i).value.trim(); if(t) reasons.push([$("e"+i).value.trim()||"💙",t]); }
+  return {kind:"recharge",to:$("to").value.trim(),from:$("from").value.trim(),reasons,note:$("note").value.trim()};
+}
+function fill(p){
+  const g=PRESETS[p]; $("to").value=g.to; $("from").value=g.from; $("note").value=g.note;
+  g.reasons.forEach((r,i)=>{$("e"+i).value=r[0]; $("r"+i).value=r[1];});
+  document.querySelectorAll("#presets .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.p===p));
+  update();
+}
+let timer;
+function update(){
+  clearTimeout(timer);
+  timer=setTimeout(()=>{
+    const g=read(), n=GiftData.normalise(g);
+    if(n) $("pv").contentWindow.location.replace("/recharge/gift.html#"+GiftData.encode(n));
+    try{ localStorage.setItem("rh_form", JSON.stringify(g)); }catch(e){}
+  },350);
+}
+$("form").addEventListener("input",update);
+$("presets").addEventListener("click",e=>{ const b=e.target.closest(".chip"); if(b) fill(b.dataset.p); });
+
+function setStatus(t,err,el){ const s=el||$("status"); s.textContent=t; s.classList.toggle("err",!!err); }
+function problem(g){
+  if(!g.to) return "Add his name.";
+  if(g.reasons.length<3) return "Add at least 3 reasons.";
+  if(!g.note) return "Write a short note for the end.";
+  return "";
+}
+function errorText(code){
+  if(code==="need_name") return "Add his name.";
+  if(code==="need_reasons") return "Add at least 3 reasons.";
+  if(code==="need_note") return "Write a short note for the end.";
+  if(code==="daily_limit") return "You've made a lot of gifts today. Please try again tomorrow.";
+  if(code==="server_setup") return "The site isn't set up correctly yet. Please DM @"+config.instagram+".";
+  if(code==="offline") return "Couldn't reach the server. Check your internet and try again.";
+  if(code==="pay_busy"||code==="no_razorpay") return "Payments aren't working right now. Please try again in a minute.";
+  if(code==="bad_utr") return "Please paste the transaction ID from your payment screen.";
+  return "Something went wrong. Please try again.";
+}
+async function post(url,body){
+  let r; try{ r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); }catch(e){ throw {code:"offline"}; }
+  const j=await r.json().catch(()=>({})); if(!r.ok) throw {code:j.error||"busy"}; return j;
+}
+
+/* gifts made on this device, so a link is never lost */
+function mine(){ try{ return JSON.parse(localStorage.getItem("rh_mine")||"[]"); }catch(e){ return []; } }
+function saveMine(x){ try{ const l=mine().filter(m=>m.id!==x.id); l.unshift(x); localStorage.setItem("rh_mine",JSON.stringify(l.slice(0,20))); }catch(e){} showMine(); }
+function showMine(){
+  const paid=mine().filter(m=>m.status==="paid"||m.status==="checking");
+  const box=$("mine"); box.replaceChildren();
+  if(!paid.length){ box.hidden=true; return; }
+  box.hidden=false; box.append("Your gifts: ");
+  paid.slice(0,3).forEach((m,i)=>{ const a=document.createElement("a"); a.href=m.url; a.target="_blank"; a.rel="noopener"; a.textContent=m.to+(m.status==="checking"?" (checking)":""); if(i) box.append(" · "); box.append(a); });
+}
+
+let draft=null; // {id, code, url, to, sig}
+$("payBtn").addEventListener("click",async()=>{
+  const g=read(), msg=problem(g);
+  if(msg){ setStatus(msg,true); return; }
+  $("payBtn").disabled=true;
+  try{
+    const sig=JSON.stringify(g);
+    if(!draft||draft.sig!==sig){
+      setStatus("Saving your gift…");
+      const j=await post("/api/wish",g);
+      draft={id:j.id,code:j.code,url:location.origin+j.path,to:g.to,sig};
+      saveMine({id:draft.id,code:draft.code,to:g.to,url:draft.url,status:"unpaid",at:Date.now()});
+    }
+    if(config.razorpay){
+      try{ await payOnline(); }
+      catch(e){ if(e&&(e.code==="pay_busy"||e.code==="no_razorpay"||e.code==="offline")&&config.upiId){ setStatus(""); showUpi(); } else throw e; }
+    } else if(config.upiId){ setStatus(""); showUpi(); }
+    else throw {code:"pay_busy"};
+  }catch(e){ setStatus(errorText(e&&e.code),true); }
+  finally{ $("payBtn").disabled=false; }
+});
+
+function loadRazorpay(){
+  if(window.Razorpay) return Promise.resolve();
+  return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src="https://checkout.razorpay.com/v1/checkout.js"; s.onload=res; s.onerror=()=>rej({code:"offline"}); document.head.appendChild(s); });
+}
+async function payOnline(){
+  setStatus("Opening payment…");
+  await loadRazorpay();
+  const o=await post("/api/pay",{id:draft.id,action:"order"});
+  setStatus("");
+  const rzp=new window.Razorpay({
+    key:o.keyId, order_id:o.orderId, amount:o.amount, currency:"INR",
+    name:"Post Pallete Studio", description:"Recharge Him gift for "+draft.to,
+    theme:{color:"#3DDC97"},
+    handler:async(resp)=>{
+      setStatus("Confirming your payment…");
+      try{ await post("/api/pay",{id:draft.id,action:"verify",...resp}); saveMine({...draft,status:"paid",at:Date.now()}); showReady(); setStatus(""); }
+      catch(e){ setStatus("We couldn't confirm the payment yet. If money was taken, DM @"+config.instagram+" your order code "+draft.code+".",true); }
+    },
+    modal:{ondismiss:()=>setStatus("Payment wasn't finished. Tap the button again whenever you're ready.")}
+  });
+  rzp.on("payment.failed",()=>setStatus("The payment didn't go through. Please try again.",true));
+  rzp.open();
+}
+
+function showReady(){
+  $("link").value=draft.url; $("openGift").href=draft.url; $("readyCode").textContent=draft.code;
+  $("wa").href="https://wa.me/?text="+encodeURIComponent("Open this when you're free 💙🔋\n"+draft.url);
+  $("readyBg").hidden=false; $("copy").textContent="Copy"; $("copy").focus();
+}
+$("copy").addEventListener("click",async()=>{
+  try{ await navigator.clipboard.writeText($("link").value); $("copy").textContent="Copied ✓"; }
+  catch(e){ $("link").select(); $("copy").textContent="Select & copy"; }
+});
+$("readyClose").addEventListener("click",()=>{ $("readyBg").hidden=true; draft=null; });
+
+function showUpi(){
+  $("upiAmt").textContent="₹"+config.rechargePrice; $("upiCode").textContent=draft.code; $("upiId").textContent=config.upiId;
+  $("upiOpen").href="upi://pay?pa="+encodeURIComponent(config.upiId)+"&pn="+encodeURIComponent(config.upiName)+"&am="+encodeURIComponent(config.rechargePrice)+"&cu=INR&tn="+encodeURIComponent("Surprise "+draft.code);
+  setStatus("",false,$("upiStatus")); $("upiBg").hidden=false;
+}
+$("paidBtn").addEventListener("click",async()=>{
+  const utr=$("utr").value.trim();
+  try{
+    await post("/api/pay",{id:draft.id,action:"claim"});
+    if(utr) await post("/api/pay",{id:draft.id,action:"utr",utr});
+    saveMine({...draft,status:"checking",at:Date.now()});
+    $("upiBg").hidden=true;
+    $("readyTitle").textContent="Thanks! We're checking your payment";
+    showReady();
+  }catch(e){ setStatus(errorText(e&&e.code),true,$("upiStatus")); }
+});
+$("upiClose").addEventListener("click",()=>{ $("upiBg").hidden=true; });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ $("upiBg").hidden=true; $("readyBg").hidden=true; } });
+
+function applyConfig(){
+  const p="₹"+config.rechargePrice;
+  $("pricePill").textContent=p+" only"; $("stepPay").textContent="2. Pay "+p;
+  $("payBtn").textContent="Pay "+p+" & get his link 🔋";
+}
+fetch("/api/config").then(r=>r.json()).then(c=>{ config={...config,...c,instagram:config.instagram}; applyConfig(); }).catch(()=>{});
+applyConfig(); showMine();
+
+let saved=null; try{ saved=JSON.parse(localStorage.getItem("rh_form")||"null"); }catch(e){}
+if(saved&&saved.to){ $("to").value=saved.to; $("from").value=saved.from||""; $("note").value=saved.note||""; (saved.reasons||[]).forEach((r,i)=>{ if(i<N){$("e"+i).value=r[0]; $("r"+i).value=r[1];} }); update(); }
+else fill("dad");
+})();
+</script>
+</body>
+</html>

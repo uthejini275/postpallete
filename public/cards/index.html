@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pallete Smart Cards: turn any PDF into study cards</title>
+<meta name="description" content="Upload your chapter, notes or slides and get key-point cards, flip cards, a quiz and a summary in a minute. Free for school, inter, degree, BTech and competitive exams.">
+<meta property="og:title" content="Pallete Smart Cards">
+<meta property="og:description" content="Turn any study PDF into cute smart cards, flip cards and a quiz. Free.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#8b5cf6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='10' y='6' width='40' height='52' rx='8' fill='%23e3d4fb' stroke='%238b5cf6' stroke-width='4'/%3E%3Crect x='18' y='18' width='24' height='5' rx='2.5' fill='%238b5cf6'/%3E%3Crect x='18' y='29' width='18' height='5' rx='2.5' fill='%23e05f9b'/%3E%3Crect x='18' y='40' width='22' height='5' rx='2.5' fill='%232f8a66'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="topbar">
+      <div class="brand">Post Pallete Studio</div>
+      <a class="ig" href="https://www.instagram.com/postpallete_.stdio/" target="_blank" rel="noopener">Follow @postpallete_.stdio</a>
+    </div>
+    <h1>Turn any PDF into <em>smart study cards</em></h1>
+    <p class="lede">Upload your chapter, notes or lecture slides. You get key-point cards, flip cards to test yourself, a quick quiz and a one-page summary. Free, with no signup. Works for school, inter, degree, BTech and competitive exams.</p>
+  </header>
+
+  <div class="how" aria-label="How it works">
+    <div><b>1. Upload a PDF</b><span>One chapter or unit at a time works best.</span></div>
+    <div><b>2. Pick your level</b><span>Cards change for school, BTech, NEET and more.</span></div>
+    <div><b>3. Study smart</b><span>Read the ⭐ cards, flip to test yourself, then take the quiz.</span></div>
+  </div>
+
+  <section class="panel" aria-labelledby="make-h">
+    <div class="maker">
+      <div>
+        <input type="file" id="file" accept="application/pdf,.pdf" hidden>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a PDF">
+          <div class="pdf-icon">PDF</div>
+          <div class="big" id="drop-big">Drop your PDF here</div>
+          <div class="small" id="drop-small">or tap to choose a file</div>
+        </div>
+        <div class="tip"><span aria-hidden="true">💡</span><span><b>One chapter at a time gives the best cards.</b> About 10–30 pages is ideal. For a whole subject, make one deck per unit. Scanned PDFs work for up to 8 pages at a time.</span></div>
+      </div>
+      <div class="fields">
+        <h2 id="make-h">Make my cards</h2>
+        <div class="row2">
+          <label class="f" for="level">I'm studying in
+            <select id="level">
+              <option value="school">School (Class 6–10)</option>
+              <option value="inter">Inter / +2 / PUC</option>
+              <option value="degree">Degree (BSc, BCom, BA)</option>
+              <option value="btech" selected>BTech / Engineering</option>
+              <option value="pg">PG / MTech / MBA</option>
+              <option value="competitive">Competitive exam (JEE, NEET, EAMCET, GATE, UPSC…)</option>
+            </select>
+          </label>
+          <label class="f" for="lang">Explain in
+            <select id="lang">
+              <option value="en">English</option>
+              <option value="te">English + Telugu</option>
+              <option value="hi">English + Hindi</option>
+            </select>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="f" for="subject">Subject <small>(optional)</small><input id="subject" type="text" maxlength="40" placeholder="e.g. Data Structures"></label>
+          <label class="f" for="exam">Exam date <small>(optional)</small><input id="exam" type="date"></label>
+        </div>
+        <div class="row2" id="range-row" hidden>
+          <label class="f" for="p-from">From page<input id="p-from" type="number" min="1" value="1"></label>
+          <label class="f" for="p-to">To page<input id="p-to" type="number" min="1" value="1"></label>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="go" type="button" disabled>Make smart cards</button>
+          <button class="btn" id="stop" type="button" hidden>Stop</button>
+          <span class="left" id="left"></span>
+        </div>
+        <div class="progress" id="bar" hidden><div></div></div>
+        <p class="status" id="status" role="status">Choose a PDF to start.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="library" id="library"></div>
+
+  <section class="panel" id="deck" aria-live="polite"></section>
+
+  <footer>Made with 💜 by <a href="https://www.instagram.com/postpallete_.stdio/" target="_blank" rel="noopener">@postpallete_.stdio</a> · Cards are made by AI, so check anything important against your textbook or notes. Your PDF is only used to make your cards and isn't stored on our site.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
