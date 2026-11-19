@@ -15,6 +15,10 @@
     {
       "source": "/r/:id",
       "destination": "/recharge/gift.html"
+    },
+    {
+      "source": "/c/:id",
+      "destination": "/recharge/magazine.html"
     }
   ],
   "headers": [

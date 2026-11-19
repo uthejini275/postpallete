@@ -29,9 +29,10 @@ http.createServer(async (req, res) => {
     }
     // Same as vercel.json: the homepage opens the birthday maker.
     if (url.pathname === "/") { res.writeHead(307, { Location: "/birthday" }); return res.end(); }
-    // Same rewrites as vercel.json: /b/<id> shows the surprise player, /r/<id> a Recharge Him gift.
+    // Same rewrites as vercel.json: /b/<id> birthday surprise, /r/<id> Recharge battery, /c/<id> magazine cover.
     const pathname = /^\/b\/[A-Za-z0-9]{6,20}\/?$/.test(url.pathname) ? "/birthday/surprise.html"
-      : /^\/r\/[A-Za-z0-9]{6,20}\/?$/.test(url.pathname) ? "/recharge/gift.html" : url.pathname;
+      : /^\/r\/[A-Za-z0-9]{6,20}\/?$/.test(url.pathname) ? "/recharge/gift.html"
+      : /^\/c\/[A-Za-z0-9]{6,20}\/?$/.test(url.pathname) ? "/recharge/magazine.html" : url.pathname;
     let p = path.normalize(decodeURIComponent(pathname)).replace(/^([/\\])+/, "");
     if (!p || p.endsWith(path.sep)) p += "index.html";
     let file = path.join(here, "public", p);

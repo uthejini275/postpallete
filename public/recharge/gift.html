@@ -144,6 +144,7 @@ async function start(){
       if (!r.ok || j.error) return showState("🔍", "We couldn't find this gift", "Check that the link is complete. Links look like postpallete.vercel.app/r/AbC123xYz9.");
       if (j.pending) return showState("⏳", "This gift is almost ready", "It opens as soon as the payment is confirmed. Try again in a few minutes.");
       if (j.kind !== "recharge") { location.replace("/b/" + m[1]); return; }
+      if (j.style === "magazine") { location.replace("/c/" + m[1]); return; }
       const g = GiftData.normalise(j);
       return g ? show(g) : showState("🔍", "We couldn't open this gift", "Please ask the person who sent it to check the link.");
     } catch (e) {

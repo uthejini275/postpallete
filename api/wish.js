@@ -53,10 +53,25 @@ function clean(b) {
   };
 }
 
-// "Recharge Him" Men's Day pages: a name, up to 6 reasons and a short note. No photos.
+// Men's Day pages at /recharge, in two styles:
+//   "battery"  → a name, 3–6 reasons and a note (no photos)
+//   "magazine" → "Man of the Year" cover: optional photo, headline, up to 3 stats and 3 quotes, and a note
 function cleanRecharge(b) {
   const to = clip(b.to, 30);
   if (!to) throw new Error("need_name");
+  const from = clip(b.from, 40);
+  if (b.style === "magazine") {
+    const note = clip(b.note, 500);
+    if (!note) throw new Error("need_note");
+    const photo = typeof b.photo === "string" ? b.photo : "";
+    if (photo && (!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(photo) || photo.length > MAX_PHOTO_CHARS)) throw new Error("bad_photo");
+    const stats = (Array.isArray(b.stats) ? b.stats : [])
+      .filter((s) => Array.isArray(s) && clip(s[0], 12) && clip(s[1], 60))
+      .slice(0, 3)
+      .map((s) => [clip(s[0], 12), clip(s[1], 60)]);
+    const quotes = (Array.isArray(b.quotes) ? b.quotes : []).map((q) => clip(q, 90)).filter(Boolean).slice(0, 3);
+    return { kind: "recharge", style: "magazine", to, from, photo, headline: clip(b.headline, 80), stats, quotes, note, photos: [] };
+  }
   const reasons = (Array.isArray(b.reasons) ? b.reasons : [])
     .filter((r) => Array.isArray(r) && clip(r[1], 120))
     .slice(0, 6)
@@ -64,7 +79,7 @@ function cleanRecharge(b) {
   if (reasons.length < 3) throw new Error("need_reasons");
   const note = clip(b.note, 400);
   if (!note) throw new Error("need_note");
-  return { kind: "recharge", to, from: clip(b.from, 40), reasons, note, photos: [] };
+  return { kind: "recharge", style: "battery", to, from, reasons, note, photos: [] };
 }
 
 export default async function handler(req, res) {
@@ -101,9 +116,10 @@ export default async function handler(req, res) {
     await setJSON("wish:" + id, { id, code, createdAt, paid: false, ...data }, KEEP_SECONDS);
     await setJSON("wishcode:" + code, id, KEEP_SECONDS);
     const kind = data.kind === "recharge" ? "recharge" : "birthday";
-    await setJSON("wishmeta:" + id, { id, code, kind, to: data.to, from: data.from, photos: data.photos.length, createdAt, paid: false, status: "awaiting_payment" }, KEEP_SECONDS);
+    await setJSON("wishmeta:" + id, { id, code, kind, style: data.style, to: data.to, from: data.from, photos: data.photos.length, createdAt, paid: false, status: "awaiting_payment" }, KEEP_SECONDS);
     await pushToList("wishlist", id);
-    return sendJson(res, 200, { id, code, path: (kind === "recharge" ? "/r/" : "/b/") + id });
+    const prefix = kind !== "recharge" ? "/b/" : data.style === "magazine" ? "/c/" : "/r/";
+    return sendJson(res, 200, { id, code, path: prefix + id });
   } catch (e) {
     console.error("save surprise failed", e.message);
     return sendJson(res, 500, { error: "busy" });

@@ -72,7 +72,7 @@
       const who = document.createElement("div"); who.className = "who";
       const code = document.createElement("span"); code.className = "code"; code.textContent = o.code + "  ";
       const isRecharge = o.kind === "recharge";
-      who.append(code, (isRecharge ? "🔋 " : "🎂 ") + "For " + o.to + (o.from ? " · from " + o.from : "") + "  ");
+      who.append(code, (isRecharge ? (o.style === "magazine" ? "📰 " : "🔋 ") : "🎂 ") + "For " + o.to + (o.from ? " · from " + o.from : "") + "  ");
       const status = o.paid ? "paid" : o.status === "checking" ? "checking" : "unpaid";
       const tag = document.createElement("span"); tag.className = "tag " + (status === "paid" ? "paid" : "unpaid");
       tag.textContent = status === "paid" ? "Paid" + (o.paidVia === "razorpay" ? " (Razorpay)" : "") : status === "checking" ? "⏳ Check payment" : "Not paid yet";
